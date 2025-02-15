@@ -16,6 +16,77 @@ XOA is a comprehensive office automation system that provides a flexible and eff
 - 🎨 **Theme Support**: Light and dark mode themes
 - 📱 **Responsive Design**: Works seamlessly across different devices
 
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Node.js 16 or higher
+- PostgreSQL database
+
+### Backend Setup
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: .\venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Configure environment variables (create a .env file with necessary settings)
+
+5. Run the development server:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+The backend API will be available at `http://localhost:8000`
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+The frontend application will be available at `http://localhost:5173`
+
+### AI API Configuration
+
+The application requires AI API credentials to function properly. Configure the following environment variables:
+
+1. Create or modify the `.env` file in the backend directory:
+   ```bash
+   # AI API Configuration
+   AI_API_BASE_URL="your_ai_api_base_url_here"
+   AI_API_KEY="your_ai_api_key_here"
+   ```
+
+2. Replace the placeholder values:
+   - `AI_API_BASE_URL`: The base URL of the AI API service
+   - `AI_API_KEY`: Your API key for authentication
+
+> Note: Keep your API key secure and never commit it to version control.
+
 ## Contributing
 
 1. Fork the repository

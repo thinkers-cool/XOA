@@ -101,7 +101,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
             name: `field_${Date.now()}`,
             label: '',
             required: false,
-            options: type === 'select' ? [''] : undefined,
+            options: type === 'select' || type === 'checkbox_group' ? [''] : undefined,
             validation: {},
             placeholder: '',
             help_text: '',

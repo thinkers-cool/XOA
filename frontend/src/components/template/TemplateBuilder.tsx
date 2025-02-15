@@ -17,12 +17,13 @@ import { WorkflowGraph } from '@/components/template/WorkflowGraph';
 import { TicketTemplate, WorkflowStep, WorkflowConfig } from '@/interface/TicketTemplate';
 
 interface TemplateBuilderProps {
-    initialTemplate?: TicketTemplate;
+    initialTemplate?: TicketTemplate | null;
+    isUpdating? : boolean;
     onSave: (template: any) => void;
     onCancel?: () => void;
 }
 
-export function TemplateBuilder({ initialTemplate, onSave, onCancel }: TemplateBuilderProps) {
+export function TemplateBuilder({ initialTemplate, isUpdating, onSave, onCancel }: TemplateBuilderProps) {
     const { t } = useTranslation();
     const [templateName, setTemplateName] = useState(initialTemplate?.name ?? '');
     const [templateDescription, setTemplateDescription] = useState(initialTemplate?.description ?? '');
@@ -137,17 +138,34 @@ export function TemplateBuilder({ initialTemplate, onSave, onCancel }: TemplateB
         return Object.keys(newErrors).length === 0 && !hasFormErrors;
     };
 
+    const ensureFormFieldAttributes = (fields: any[]) => {
+        return fields.map(field => ({
+            ...field,
+            required: field.required === undefined ? false : field.required,
+            label: field.label || field.name || '',
+            description: field.description || '',
+            placeholder: field.placeholder || '',
+            defaultValue: field.defaultValue === undefined ? null : field.defaultValue
+        }));
+    };
+
     const handleSave = () => {
         if (!validateTemplate()) {
             return;
         }
+
+        // Ensure all workflow steps have properly formatted form fields
+        const validatedWorkflow = workflow.map(step => ({
+            ...step,
+            form: ensureFormFieldAttributes(step.form || [])
+        }));
 
         const template = {
             name: templateName,
             description: templateDescription,
             titleFormat,
             defaultPriority,
-            workflow,
+            workflow: validatedWorkflow,
             workflowConfig
         };
         onSave(template);
@@ -464,7 +482,7 @@ export function TemplateBuilder({ initialTemplate, onSave, onCancel }: TemplateB
                 )}
                 <Button onClick={handleSave}>
                     {initialTemplate ? <Save className="mr-2 h-4 w-4" /> : <Check className="mr-2 h-4 w-4" />}
-                    {initialTemplate ? t('template.builder.buttons.update') : t('template.builder.buttons.save')}
+                    {initialTemplate && isUpdating ? t('template.builder.buttons.update') : t('template.builder.buttons.save')}
                 </Button>
             </div>
         </div>

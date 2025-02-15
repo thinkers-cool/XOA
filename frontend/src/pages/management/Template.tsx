@@ -3,22 +3,24 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Type, Plus, Clock, Edit, X, Workflow } from 'lucide-react';
+import { Type, Plus, Clock, Edit, X, Workflow, PlusCircle } from 'lucide-react';
 import { TemplateBuilder } from '@/components/template/TemplateBuilder';
 import { templateApi } from '@/lib/api';
 import { TicketTemplate } from '@/interface/TicketTemplate';
 import { WorkflowGraph } from '@/components/template/WorkflowGraph';
 import { WorkflowStepItem } from '@/components/template/WorkflowStepItem';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AIAssistant } from '@/components/ai/AIAssistant';
 
 export default function TicketTemplateManagement() {
   const [templates, setTemplates] = useState<TicketTemplate[]>([]);
   const [activeTab, setActiveTab] = useState('templates');
   const [selectedTemplate, setSelectedTemplate] = useState<TicketTemplate | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<TicketTemplate | null>(null);
   const { t } = useTranslation();
+  const [showBuilder, setShowBuilder] = useState(false);
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -50,6 +52,27 @@ export default function TicketTemplateManagement() {
     }
   };
 
+  const handleAISuggest = (suggestedTemplate: any) => {
+    // Initialize with suggested data but without an ID for new template
+    setSelectedTemplate({
+      name: suggestedTemplate.name,
+      description: suggestedTemplate.description,
+      title_format: suggestedTemplate.title_format,
+      default_priority: suggestedTemplate.default_priority || 'medium',
+      workflow: suggestedTemplate.workflow || [],
+      workflow_config: suggestedTemplate.workflow_config || {
+        parallel_execution: false,
+        auto_assignment: false,
+        notification_rules: []
+      }
+    });
+    setIsUpdating(false);
+    
+    // Show the builder and switch to builder tab
+    setShowBuilder(true);
+    setActiveTab('builder');
+  };
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
@@ -57,10 +80,12 @@ export default function TicketTemplateManagement() {
           <h1 className="text-3xl font-bold">{t('template.title')}</h1>
           <p className="">{t('template.subtitle')}</p>
         </div>
-        <Button onClick={() => setActiveTab('builder')}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('template.create')}
-        </Button>
+        {!showBuilder && (
+          <Button onClick={() => setShowBuilder(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {t('template.create')}
+          </Button>
+        )}
       </div>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -169,7 +194,7 @@ export default function TicketTemplateManagement() {
                             variant="default"
                             onClick={() => {
                               setSelectedTemplate(template);
-                              setIsEditing(true);
+                              setIsUpdating(true);
                               setActiveTab('builder');
                             }}
                           >
@@ -187,54 +212,76 @@ export default function TicketTemplateManagement() {
         </TabsContent>
 
         <TabsContent value="builder">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('template.createNew')}</CardTitle>
-              <CardDescription>
-                {t('template.createNewDesc')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TemplateBuilder
-                initialTemplate={isEditing ? selectedTemplate || undefined : undefined}
-                onSave={async (template) => {
-                  try {
-                    const templateData = {
-                      name: template.name,
-                      description: template.description,
-                      title_format: template.titleFormat,
-                      default_priority: template.defaultPriority,
-                      workflow: [...template.workflow],
-                      workflow_config: template.workflowConfig
-                    };
+          {showBuilder ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('template.createNew')}</CardTitle>
+                <CardDescription>
+                  {t('template.createNewDesc')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TemplateBuilder
+                  initialTemplate={selectedTemplate}
+                  isUpdating={isUpdating}
+                  onSave={async (template) => {
+                    try {
+                      const templateData = {
+                        name: template.name,
+                        description: template.description,
+                        title_format: template.titleFormat,
+                        default_priority: template.defaultPriority,
+                        workflow: [...template.workflow],
+                        workflow_config: template.workflowConfig
+                      };
 
-                    if (isEditing && selectedTemplate) {
-                      const updatedTemplate = await templateApi.update(selectedTemplate.id!, templateData);
-                      setTemplates(templates.map(t =>
-                        t.id === selectedTemplate.id ? { ...updatedTemplate, workflow: updatedTemplate.workflow || [] } : t
-                      ));
-                    } else {
-                      const newTemplate = await templateApi.create(templateData);
-                      setTemplates([...templates, { ...newTemplate, workflow: newTemplate.workflow || [] }]);
+                      if (selectedTemplate && isUpdating) {
+                        const updatedTemplate = await templateApi.update(selectedTemplate.id!, templateData);
+                        setTemplates(templates.map(t =>
+                          t.id === selectedTemplate.id ? { ...updatedTemplate, workflow: updatedTemplate.workflow || [] } : t
+                        ));
+                      } else {
+                        const newTemplate = await templateApi.create(templateData);
+                        setTemplates([...templates, { ...newTemplate, workflow: newTemplate.workflow || [] }]);
+                      }
                     }
-                  }
-                  catch (error) {
-                    console.error(error);
-                  }
-                  setSelectedTemplate(null);
-                  setIsEditing(false);
-                  setActiveTab('templates');
-                }}
-                onCancel={() => {
-                  setSelectedTemplate(null);
-                  setIsEditing(false);
-                  setActiveTab('templates');
-                }}
-              />
-            </CardContent>
-          </Card>
+                    catch (error) {
+                      console.error(error);
+                    }
+                    setSelectedTemplate(null);
+                    setIsUpdating(false);
+                    setActiveTab('templates');
+                    setShowBuilder(false);
+                  }}
+                  onCancel={() => {
+                    setSelectedTemplate(null);
+                    setIsUpdating(false);
+                    setActiveTab('templates');
+                    setShowBuilder(false);
+                  }}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('template.createNew')}</CardTitle>
+                <CardDescription>
+                  {t('template.createNewDesc')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setShowBuilder(true)}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  {t('template.create')}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
+
+      <AIAssistant onSuggest={handleAISuggest} />
     </div>
   );
 }

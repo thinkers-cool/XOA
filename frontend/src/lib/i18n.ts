@@ -672,6 +672,13 @@ const resources = {
           placeholder: 'Search entries...'
         },
       },
+      ai: {
+        assistant: "AI Assistant",
+        inputPlaceholder: "Describe the ticket template you need...",
+        newChat: "New Chat",
+        send: "Send",
+        error: "Sorry, an error occurred while processing your request. Please try again."
+      }
     },
   },
   zh: {
@@ -1343,6 +1350,13 @@ const resources = {
           placeholder: '搜索条目...'
         },
       },
+      ai: {
+        assistant: "AI助手",
+        inputPlaceholder: "描述您需要的工单模板...",
+        newChat: "新对话",
+        send: "发送",
+        error: "抱歉，处理您的请求时出现错误。请重试。"
+      }
     },
   },
 };
