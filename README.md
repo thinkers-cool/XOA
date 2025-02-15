@@ -22,7 +22,6 @@ XOA is a comprehensive office automation system that provides a flexible and eff
 
 - Python 3.8 or higher
 - Node.js 16 or higher
-- PostgreSQL database
 
 ### Backend Setup
 
@@ -69,6 +68,37 @@ The backend API will be available at `http://localhost:8000`
    ```
 
 The frontend application will be available at `http://localhost:5173`
+
+### Docker Deployment
+
+The application can be easily deployed using Docker Compose, which will set up the frontend and backend.
+
+1. Set up environment variables:
+   - Copy `.env.example` to `.env` in the backend directory
+   - Configure the following environment variables in `.env`:
+     ```bash
+     # Required settings
+     SECRET_KEY="your-secret-key-here"
+     
+     # Required if using AI features
+     AI_API_BASE_URL="your_ai_api_base_url_here"
+     AI_API_KEY="your_ai_api_key_here"
+     ```
+
+2. Build and start the containers:
+   ```bash
+   docker-compose up --build
+   ```
+
+   This will:
+   - Build and start the backend service (available at `http://localhost:8000`)
+   - Build and start the frontend service (available at `http://localhost:5173`)
+   - Set up proper volume mappings for development and data persistence
+
+3. To stop the services:
+   ```bash
+   docker-compose down
+   ```
 
 ### AI API Configuration
 
