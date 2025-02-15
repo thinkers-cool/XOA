@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes';
 import { Layout } from '@/Layout';
 import Tickets from '@/pages/Tickets';
 import Login from '@/pages/Login';
+import Register from '@/pages/Register';
 import UserProfile from '@/pages/user/Profile';
 import UserPreferences from '@/pages/user/Preferences';
 import TicketTemplateManagement from '@/pages/management/Template';
@@ -25,6 +26,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/*"
             element={

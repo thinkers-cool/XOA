@@ -140,11 +140,28 @@ const resources = {
       },
       auth: {
         login: {
-          title: 'Login',
-          username: 'Username',
-          password: 'Password',
-          submit: 'Login',
-          loggingIn: 'Logging in...',
+          title: '登录',
+          usernameLabel: '用户名',
+          passwordLabel: '密码',
+          submit: '登录',
+          loggingIn: '登录中...',
+          noAccount: '还没有账号？',
+          registerLink: '注册'
+        },
+        register: {
+          title: '创建账号',
+          description: '请输入您的信息以创建账号',
+          usernameLabel: '用户名',
+          fullNameLabel: '姓名',
+          emailLabel: '邮箱',
+          passwordLabel: '密码',
+          confirmPasswordLabel: '确认密码',
+          submit: '注册',
+          registering: '注册中...',
+          haveAccount: '已有账号？',
+          loginLink: '登录',
+          passwordMismatch: '两次输入的密码不一致',
+          error: '注册失败'
         },
         logout: 'Logout',
         email: 'Email',
@@ -819,10 +836,27 @@ const resources = {
       auth: {
         login: {
           title: '登录',
-          username: '用户名',
-          password: '密码',
+          usernameLabel: '用户名',
+          passwordLabel: '密码',
           submit: '登录',
           loggingIn: '登录中...',
+          noAccount: '还没有账号？',
+          registerLink: '注册'
+        },
+        register: {
+          title: '创建账号',
+          description: '请输入您的信息以创建账号',
+          usernameLabel: '用户名',
+          fullNameLabel: '姓名',
+          emailLabel: '邮箱',
+          passwordLabel: '密码',
+          confirmPasswordLabel: '确认密码',
+          submit: '注册',
+          registering: '注册中...',
+          haveAccount: '已有账号？',
+          loginLink: '登录',
+          passwordMismatch: '两次输入的密码不一致',
+          error: '注册失败'
         },
         logout: '退出',
         email: '邮箱',

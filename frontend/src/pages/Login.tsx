@@ -44,23 +44,33 @@ export default function Login() {
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
+                            <label htmlFor="username" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                {t('auth.login.usernameLabel')}
+                            </label>
                             <Input
+                                id="username"
                                 type="text"
                                 name="username"
-                                placeholder={t('auth.login.username')}
+                                placeholder=""
                                 value={formData.username}
                                 onChange={handleChange}
                                 required
+                                className="transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2"
                             />
                         </div>
                         <div className="space-y-2">
+                            <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                {t('auth.login.passwordLabel')}
+                            </label>
                             <Input
+                                id="password"
                                 type="password"
                                 name="password"
-                                placeholder={t('auth.login.password')}
+                                placeholder=""
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
+                                className="transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2"
                             />
                         </div>
                         {authError && (
@@ -76,6 +86,12 @@ export default function Login() {
                         >
                             {userLoading ? t('auth.login.loggingIn') : t('auth.login.submit')}
                         </Button>
+                        <div className="text-center text-sm mt-4">
+                            <span className="text-muted-foreground">{t('auth.login.noAccount')} </span>
+                            <Button variant="link" className="p-0 h-auto font-normal" onClick={() => navigate('/register')}>
+                                {t('auth.login.registerLink')}
+                            </Button>
+                        </div>
                     </form>
                 </CardContent>
             </Card>

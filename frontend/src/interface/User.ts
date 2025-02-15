@@ -24,7 +24,7 @@ export interface UserCreate {
   email: string;
   username: string;
   full_name: string;
-  hashed_password?: string;
+  password?: string;
   avatar_url?: string;
   is_active?: boolean;
   is_superuser?: boolean;
@@ -36,7 +36,7 @@ export interface UserUpdate {
   email?: string;
   username?: string;
   full_name?: string;
-  hashed_password?: string;
+  password?: string;
   avatar_url?: string;
   is_active?: boolean;
   is_superuser?: boolean;

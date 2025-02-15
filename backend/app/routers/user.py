@@ -6,7 +6,9 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from ..crud import user as crud_user
+from ..crud import role as crud_role
 from ..schemas.user import User, UserCreate, UserUpdate
+from ..schemas.role import RoleCreate, UserRoleCreate
 from ..database import get_db
 from .auth import get_current_user, verify_password
 from ..settings import AVATAR_UPLOAD_DIR
@@ -18,7 +20,40 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = crud_user.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return crud_user.create_user(db=db, user=user)
+
+    # Check if this is the first user registration
+    existing_users = crud_user.get_users(db, skip=0, limit=1)
+    is_first_user = len(existing_users) == 0
+
+    # Create the user
+    try:
+        db_user = crud_user.create_user(db=db, user=user)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # If this is the first user, create admin role and assign it
+    if is_first_user:
+        # Create admin role with all permissions
+        admin_role = RoleCreate(
+            name="admin",
+            description="Administrator with full system access",
+            permissions=["*"]  # Wildcard permission for full access
+        )
+        try:
+            db_role = crud_role.create_role(db=db, role=admin_role)
+            # Assign admin role to the user
+            user_role = UserRoleCreate(
+                user_id=db_user.id,
+                role_id=db_role.id
+            )
+            crud_role.assign_user_role(db=db, user_role=user_role)
+            # Set user as superuser
+            db_user.is_superuser = True
+            db.commit()
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    return db_user
 
 @router.get("/", response_model=List[User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
