@@ -258,7 +258,7 @@ export function AIAssistant({ onSuggest }: AIAssistantProps) {
             <h3 className="font-medium">{t('ai.assistant')}</h3>
             <div className="flex gap-2">
               <Button 
-                variant="ghost" 
+                variant={null} 
                 size="icon"
                 onClick={handleNewChat}
                 disabled={isLoading}
@@ -267,13 +267,13 @@ export function AIAssistant({ onSuggest }: AIAssistantProps) {
                 <PlusCircle className="h-4 w-4" />
               </Button>
               <Button 
-                variant="ghost" 
+                variant={null} 
                 size="icon"
                 onClick={() => setIsMaximized(!isMaximized)}
               >
                 {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+              <Button variant={null} size="icon" onClick={() => setIsOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>

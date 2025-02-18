@@ -162,7 +162,7 @@ export default function Register() {
                         </Button>
                         <div className="text-center text-sm">
                             <span className="text-muted-foreground">{t('auth.register.haveAccount')} </span>
-                            <Button variant="link" className="p-0 h-auto font-normal" onClick={() => navigate('/login')}>
+                            <Button variant="neutral" className="p-0 h-auto font-normal" onClick={() => navigate('/login')}>
                                 {t('auth.register.loginLink')}
                             </Button>
                         </div>

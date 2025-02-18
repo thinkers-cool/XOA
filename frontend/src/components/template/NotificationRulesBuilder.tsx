@@ -119,7 +119,7 @@ export function NotificationRulesBuilder({ rules, onChange }: NotificationRulesB
                                 </div>
                             </div>
                             <Button
-                                variant="ghost"
+                                variant={null}
                                 size="icon"
                                 onClick={() => removeRule(index)}
                                 className="hover:bg-destructive/10 hover:text-destructive"
@@ -130,7 +130,7 @@ export function NotificationRulesBuilder({ rules, onChange }: NotificationRulesB
                     </CardContent>
                 </Card>
             ))}
-            <Button onClick={addRule} variant="outline" className="w-full">
+            <Button onClick={addRule} variant="neutral" className="w-full">
                 <Plus className="mr-2 h-4 w-4" />
                 {t('template.builder.buttons.addNotificationRule')}
             </Button>

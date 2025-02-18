@@ -145,7 +145,7 @@ export function ResourceBuilder({ initialResource, onSave, onCancel }: ResourceB
 
       <div className="flex justify-end gap-2">
         {onCancel && (
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="neutral" onClick={onCancel}>
             <X className="mr-2 h-4 w-4" />
             {t('resources.builder.buttons.cancel')}
           </Button>

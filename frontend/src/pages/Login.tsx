@@ -88,7 +88,7 @@ export default function Login() {
                         </Button>
                         <div className="text-center text-sm mt-4">
                             <span className="text-muted-foreground">{t('auth.login.noAccount')} </span>
-                            <Button variant="link" className="p-0 h-auto font-normal" onClick={() => navigate('/register')}>
+                            <Button variant="neutral" className="p-0 h-auto font-normal" onClick={() => navigate('/register')}>
                                 {t('auth.login.registerLink')}
                             </Button>
                         </div>

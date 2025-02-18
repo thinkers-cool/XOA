@@ -55,7 +55,7 @@ export function WorkflowGraph({ workflow, visible }: WorkflowGraphProps) {
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <Button
-                    variant="ghost"
+                    variant={null}
                     className="flex items-center gap-2"
                     onClick={() => setIsVisible(!isVisible)}
                     title={t('template.workflowGraph.toggle')}

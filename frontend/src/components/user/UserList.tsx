@@ -208,7 +208,7 @@ export function UserList() {
                                             userRole.reports_to_id && (
                                                 <Badge
                                                     key={userRole.id}
-                                                    variant="outline"
+                                                    variant="neutral"
                                                     className="hover:bg-primary/10 transition-colors cursor-default py-1 px-2"
                                                 >
                                                     {users.find((u) => u.id === userRole.reports_to_id)?.full_name}
@@ -219,7 +219,7 @@ export function UserList() {
                                 </TableCell>
                                 <TableCell className="py-3 text-center">
                                     <Badge
-                                        variant={user.is_active ? 'default' : 'secondary'}
+                                        variant={user.is_active ? 'default' : 'neutral'}
                                         className="px-2 py-1"
                                     >
                                         {t(`user.status.${user.is_active ? 'active' : 'inactive'}`)}
@@ -229,7 +229,7 @@ export function UserList() {
                                     <div className="flex justify-end gap-1">
                                         {hasPermission(PERMISSIONS.USER.UPDATE) &&
                                             <Button
-                                                variant="ghost"
+                                                variant={null}
                                                 size="icon"
                                                 className="h-8 w-8"
                                                 onClick={() => {
@@ -244,7 +244,7 @@ export function UserList() {
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
                                                     <Button
-                                                        variant="ghost"
+                                                        variant={null}
                                                         size="icon"
                                                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                                                     >

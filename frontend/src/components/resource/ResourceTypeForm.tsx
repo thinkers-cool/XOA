@@ -60,7 +60,7 @@ export function ResourceTypeForm({
       <div className="flex justify-end gap-2">
         <Button
           type="button"
-          variant="outline"
+          variant="neutral"
           onClick={onCancel}
           disabled={isSubmitting}
         >

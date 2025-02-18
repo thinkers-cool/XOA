@@ -115,7 +115,7 @@ export function RoleForm({ role, onSubmit, onCancel }: RoleFormProps) {
         <div className="flex justify-end space-x-2">
           <Button
             type="button"
-            variant="outline"
+            variant="neutral"
             onClick={onCancel}
           >
             {t('common.cancel')}

@@ -301,7 +301,7 @@ export function TemplateBuilder({ initialTemplate, isUpdating, onSave, onCancel 
                             <h3 className="text-lg font-medium">{t('template.builder.labels.workflow')}</h3>
                             <p className="text-sm text-muted-foreground">{t('template.builder.descriptions.workflow')}</p>
                         </div>
-                        <Button onClick={addStep} variant="outline">
+                        <Button onClick={addStep} variant="neutral">
                             <Plus className="mr-2 h-4 w-4" />
                             {t('template.builder.buttons.addStep')}
                         </Button>
@@ -373,7 +373,7 @@ export function TemplateBuilder({ initialTemplate, isUpdating, onSave, onCancel 
                                                                 </div>
                                                                 <div className="flex items-start justify-end">
                                                                     <Button
-                                                                        variant="ghost"
+                                                                        variant={null}
                                                                         size="icon"
                                                                         onClick={() => removeStep(step.id)}
                                                                         className="hover:bg-destructive/10 hover:text-destructive"
@@ -475,7 +475,7 @@ export function TemplateBuilder({ initialTemplate, isUpdating, onSave, onCancel 
 
             <div className="flex justify-end gap-2">
                 {onCancel && (
-                    <Button variant="outline" onClick={onCancel}>
+                    <Button variant="neutral" onClick={onCancel}>
                         <X className="mr-2 h-4 w-4" />
                         {t('template.builder.buttons.cancel')}
                     </Button>

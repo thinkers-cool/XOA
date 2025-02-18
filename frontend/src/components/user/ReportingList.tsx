@@ -79,7 +79,7 @@ export function ReportingList() {
               <div className="font-medium">{user.full_name}</div>
               <div className="flex flex-wrap gap-1 mt-1">
                 {userRoles[user.id]?.map((userRole) => (
-                  <Badge key={userRole.role_id} variant="secondary" className="text-xs">
+                  <Badge key={userRole.role_id} variant="neutral" className="text-xs">
                     {roles.find(r => r.id === userRole.role_id)?.name}
                   </Badge>
                 ))}

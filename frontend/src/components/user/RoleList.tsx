@@ -176,7 +176,7 @@ export function RoleList() {
                                 <TableCell className="py-3 text-center">
                                     <div className="flex flex-wrap justify-center gap-1">
                                         {role.permissions.map((permission) => (
-                                            <Badge key={permission} variant="secondary">
+                                            <Badge key={permission} variant="neutral">
                                                 {t(`role.permission.${permission}`)}
                                             </Badge>
                                         ))}
@@ -187,7 +187,7 @@ export function RoleList() {
                                     <div className="flex justify-center gap-2">
                                         {hasPermission(PERMISSIONS.ROLE.UPDATE) &&
                                             <Button
-                                                variant="ghost"
+                                                variant={null}
                                                 size="icon"
                                                 onClick={() => {
                                                     setSelectedRole(role);
@@ -201,7 +201,7 @@ export function RoleList() {
                                             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                                                 <AlertDialogTrigger asChild>
                                                     <Button
-                                                        variant="ghost"
+                                                        variant={null}
                                                         size="icon"
                                                         className="text-destructive hover:text-destructive"
                                                         onClick={() => {

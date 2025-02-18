@@ -4,6 +4,7 @@ import { useTheme } from 'next-themes';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { LayoutDashboard, Ticket, Settings, ChevronRight, User as UserIcon, Sun, Moon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { API_BASE_URL } from '@/lib/api';
@@ -86,7 +87,7 @@ export function Layout({ children }: LayoutProps) {
     return (
       <li key={item.name}>
         <Button
-          variant={isSelected ? "secondary" : "ghost"}
+          variant={isSelected ? "neutral" : null}
           className={`w-full justify-between ${isCollapsed ? 'px-3' : ''}`}
           onClick={() => item.children ? toggleExpand(item.name) : navigate(item.href!)}
         >
@@ -103,7 +104,7 @@ export function Layout({ children }: LayoutProps) {
             {item.children.map(child => (
               <li key={child.name}>
                 <Button
-                  variant={location.pathname === child.href ? "secondary" : "ghost"}
+                  variant={location.pathname === child.href ? "default" : null}
                   className="w-full justify-start"
                   onClick={() => navigate(child.href!)}
                 >
@@ -148,7 +149,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="fixed top-0 right-0 flex h-16 items-center justify-between px-4 border-b border-border bg-background z-40" style={{ width: `calc(100% - ${isCollapsed ? '4rem' : '14rem'})` }}>
             <div className="flex items-center gap-4">
               <Button
-                variant="ghost"
+                variant={null}
                 size="icon"
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="h-9 w-9 hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -156,7 +157,7 @@ export function Layout({ children }: LayoutProps) {
                 <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${isCollapsed ? '' : 'rotate-180'}`} />
               </Button>
               <div className="relative w-96">
-                <input
+                <Input
                   type="text"
                   placeholder={t('common.search')}
                   className="w-full h-9 px-3 py-2 bg-background text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input"
@@ -166,7 +167,7 @@ export function Layout({ children }: LayoutProps) {
             <div className="flex items-center gap-2">
               <LanguageSelector />
               <Button
-                variant="ghost"
+                variant={null}
                 size="icon"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className="h-9 w-9"
@@ -176,7 +177,7 @@ export function Layout({ children }: LayoutProps) {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full overflow-hidden p-0">
+                  <Button variant={null} size="icon" className="h-8 w-8 rounded-full overflow-hidden p-0">
                     {user?.avatar_url ? (
                       <img
                         src={`${API_BASE_URL}${user.avatar_url}`}

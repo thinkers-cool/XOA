@@ -95,7 +95,7 @@ export default function ResourceManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" onClick={() => setActiveTab('builder')}>
+                <Button variant="neutral" onClick={() => setActiveTab('builder')}>
                   <Plus className="mr-2 h-4 w-4" />
                   {t('resources.createFirst')}
                 </Button>
@@ -110,7 +110,7 @@ export default function ResourceManagement() {
                     <p className="text-muted-foreground mb-4">{type.description}</p>
                     <div className="flex justify-between items-center gap-2">
                         <Button
-                          variant="outline"
+                          variant="neutral"
                           size="sm"
                           onClick={() => {
                               setSelectedResourceType(type);
@@ -123,7 +123,7 @@ export default function ResourceManagement() {
                         </Button>
                         <div className="flex justify-end items-center gap-2">
                           <Button
-                            variant="outline"
+                            variant="neutral"
                             size="sm"
                             onClick={() => handleViewEntries(type)}
                             className="sm:w-auto w-10 p-0 sm:p-2"
@@ -221,7 +221,7 @@ export default function ResourceManagement() {
                                       if (typeof value === 'object') {
                                         return (
                                           <Button
-                                            variant="ghost"
+                                            variant={null}
                                             className="h-8"
                                             onClick={() => {
                                               console.log('Show detailed view:', value);
@@ -254,7 +254,7 @@ export default function ResourceManagement() {
                           </div>
                           <div className="flex items-center space-x-2">
                             <Button
-                              variant="outline"
+                              variant="neutral"
                               className="h-8 w-8 p-0"
                               onClick={() => setPage(1)}
                               disabled={page === 1}
@@ -263,7 +263,7 @@ export default function ResourceManagement() {
                               <ChevronsLeft className="h-4 w-4" />
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="neutral"
                               className="h-8 w-8 p-0"
                               onClick={() => setPage(page - 1)}
                               disabled={page === 1}
@@ -272,7 +272,7 @@ export default function ResourceManagement() {
                               <ChevronLeft className="h-4 w-4" />
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="neutral"
                               className="h-8 w-8 p-0"
                               onClick={() => setPage(page + 1)}
                               disabled={page * pageSize >= filteredEntries.length}
@@ -281,7 +281,7 @@ export default function ResourceManagement() {
                               <ChevronRight className="h-4 w-4" />
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="neutral"
                               className="h-8 w-8 p-0"
                               onClick={() => setPage(Math.ceil(filteredEntries.length / pageSize))}
                               disabled={page * pageSize >= filteredEntries.length}

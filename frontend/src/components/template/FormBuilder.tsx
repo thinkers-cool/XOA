@@ -176,7 +176,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
                     {FIELD_TYPES.map(({ type, label, icon: Icon }) => (
                         <Button
                             key={type}
-                            variant="outline"
+                            variant="neutral"
                             className="flex items-center justify-center h-8 w-8"
                             onClick={() => addField(type)}
                             title={label}
@@ -192,7 +192,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
                     {(provided) => (
                         <div className="relative">
                             <Button
-                                variant="ghost"
+                                variant={null}
                                 size="icon"
                                 className="absolute -top-10 right-0 z-10 group"
                                 title="Preview"
@@ -240,7 +240,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
                                                                 {WIDTH_OPTIONS.map(option => (
                                                                     <Button
                                                                         key={option.value}
-                                                                        variant={field.width === option.value ? 'outline' : 'ghost'}
+                                                                        variant={field.width === option.value ? 'neutral' : null}
                                                                         size="icon"
                                                                         onClick={() => updateField(field.id, { width: option.value as FormField['width'] })}
                                                                         title={option.label}
@@ -252,7 +252,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
                                                             </div>
 
                                                             <Button
-                                                                variant="ghost"
+                                                                variant={null}
                                                                 size="icon"
                                                                 onClick={() => removeField(field.id)}
                                                             >
@@ -467,7 +467,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
                                                                                 )}
                                                                             </div>
                                                                             <Button
-                                                                                variant="ghost"
+                                                                                variant={null}
                                                                                 size="icon"
                                                                                 onClick={() => removeOption(field.id, optionIndex)}
                                                                             >
@@ -476,7 +476,7 @@ export function FormBuilder({ fields, onChange, onValidationChange }: FormBuilde
                                                                         </div>
                                                                     ))}
                                                                     <Button
-                                                                        variant="outline"
+                                                                        variant="neutral"
                                                                         size="sm"
                                                                         onClick={() => addOption(field.id)}
                                                                     >

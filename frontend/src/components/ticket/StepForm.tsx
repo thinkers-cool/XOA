@@ -181,10 +181,10 @@ export function StepForm({ isOpen, onClose, onSubmit, fields, stepName, stepDesc
                       </div>
                       {index === currentStepIndex && !isCompleted && (
                         <div className="flex justify-end gap-2">
-                          <Button type="button" variant="outline" onClick={handleClose}>
+                          <Button type="button" variant="neutral" onClick={handleClose}>
                             {t('common.cancel')}
                           </Button>
-                          <Button type="button" variant="secondary" onClick={() => {
+                          <Button type="button" variant="neutral" onClick={() => {
                             const data = form.getValues();
                             onSubmit({ ...data, isDraft: true });
                             setIsDirty(false);
@@ -215,10 +215,10 @@ export function StepForm({ isOpen, onClose, onSubmit, fields, stepName, stepDesc
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setShowConfirmClose(false)}>
+            <Button type="button" variant="neutral" onClick={() => setShowConfirmClose(false)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={handleConfirmClose}>
+            <Button variant="default" onClick={handleConfirmClose}>
               {t('common.discard')}
             </Button>
           </div>

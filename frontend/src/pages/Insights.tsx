@@ -255,7 +255,7 @@ export default function Insights() {
               <SelectItem value="365d">{t('insights.timeRange.year')}</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={handleExport}>
+          <Button variant="neutral" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" />
             {t('insights.export')}
           </Button>
@@ -271,7 +271,7 @@ export default function Insights() {
                 <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold">{metric.value}</h3>
-                  <Badge variant={metric.trend === 'up' ? 'default' : 'secondary'}>
+                  <Badge variant={metric.trend === 'up' ? 'default' : 'neutral'}>
                     {metric.change}
                   </Badge>
                 </div>
@@ -446,7 +446,7 @@ export default function Insights() {
                   <SelectItem value="resource">{t('insights.type.resource')}</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon">
+              <Button variant="neutral" size="icon">
                 <Filter className="h-4 w-4" />
               </Button>
             </div>
@@ -471,8 +471,8 @@ export default function Insights() {
                   <TableCell>
                     {row.type === 'Ticket' ? (
                       <Badge
-                        variant={row.priority === 'high' ? 'destructive' :
-                          row.priority === 'medium' ? 'default' : 'secondary'}
+                        variant={row.priority === 'high' ? 'default' :
+                          row.priority === 'medium' ? 'default' : 'neutral'}
                       >
                         {row.priority}
                       </Badge>
@@ -481,7 +481,7 @@ export default function Insights() {
                   <TableCell>
                     <Badge
                       variant={row.status === 'resolved' ? 'default' :
-                        row.status === 'active' ? 'secondary' : 'outline'}
+                        row.status === 'active' ? 'neutral' : null}
                     >
                       {row.status}
                     </Badge>
@@ -504,7 +504,7 @@ export default function Insights() {
               </div>
               <div className="flex items-center space-x-2">
                 <Button
-                  variant="outline"
+                  variant="neutral"
                   className="h-8 w-8 p-0"
                   onClick={() => setCurrentPage(1)}
                   disabled={currentPage === 1}
@@ -513,7 +513,7 @@ export default function Insights() {
                   <ChevronsLeft className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="neutral"
                   className="h-8 w-8 p-0"
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
@@ -522,7 +522,7 @@ export default function Insights() {
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="neutral"
                   className="h-8 w-8 p-0"
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage >= totalPages}
@@ -531,7 +531,7 @@ export default function Insights() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="neutral"
                   className="h-8 w-8 p-0"
                   onClick={() => setCurrentPage(totalPages)}
                   disabled={currentPage >= totalPages}

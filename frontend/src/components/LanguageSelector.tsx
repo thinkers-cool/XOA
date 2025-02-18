@@ -25,7 +25,7 @@ export function LanguageSelector() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Button variant={null} size="sm" className="flex items-center gap-2">
                     {currentLanguage ?
                         <currentLanguage.icon className="h-4 w-4" /> :
                         <Globe2 className="h-4 w-4" />

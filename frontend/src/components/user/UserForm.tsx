@@ -230,7 +230,7 @@ export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
         <div className="flex justify-end space-x-2">
           <Button
             type="button"
-            variant="outline"
+            variant="neutral"
             onClick={onCancel}
           >
             {t('common.cancel')}

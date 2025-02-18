@@ -50,9 +50,9 @@ export function TicketVisualization({
         <div className="mb-3 flex justify-between items-start">
           <h3 className="text-lg font-semibold">{ticket.title}</h3>
           <Badge
-            variant={ticket.priority === 'high' ? 'destructive' : 
+            variant={ticket.priority === 'high' ? 'default' : 
                     ticket.priority === 'medium' ? 'default' : 
-                    'secondary'}
+                    'neutral'}
           >
             {t(`tickets.priority.${ticket.priority}`)}
           </Badge>
@@ -115,7 +115,7 @@ export function TicketVisualization({
                       <div className="flex items-center gap-1 shrink-0">
                         {hasFormData && (
                           <Button
-                            variant="ghost"
+                            variant={null}
                             className="h-7"
                             onClick={() => toggleStepExpand(step.id)}
                           >
@@ -125,7 +125,7 @@ export function TicketVisualization({
                         )}
                         {isCompleted ? (
                           <Button
-                            variant="ghost"
+                            variant={null}
                             className="h-7"
                             onClick={() => onStepClick(ticket, step.id)}
                           >
@@ -134,7 +134,7 @@ export function TicketVisualization({
                           </Button>
                         ) : isInProgress && stepData?.assignee_id === currentUser?.id ? (
                           <Button
-                            variant="ghost"
+                            variant={null}
                             className="h-7"
                             onClick={() => onStepClick(ticket, step.id)}
                           >
@@ -143,7 +143,7 @@ export function TicketVisualization({
                           </Button>
                         ) : !isCompleted && !isInProgress && (
                           <Button
-                            variant="ghost"
+                            variant={null}
                             className="h-7"
                             onClick={() => onAssignClick(ticket, step.id)}
                           >

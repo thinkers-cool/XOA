@@ -101,10 +101,10 @@ export default function TicketTemplateManagement() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button variant="neutral" onClick={() => setDeleteDialogOpen(false)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
+            <Button variant="default" onClick={handleDeleteConfirm}>
               {t('common.delete')}
             </Button>
           </DialogFooter>
@@ -130,7 +130,7 @@ export default function TicketTemplateManagement() {
               </CardHeader>
               <CardContent>
                 {hasPermission(PERMISSIONS.TICKET_TEMPLATE.CREATE) && 
-                <Button variant="outline" onClick={() => setActiveTab('builder')}>
+                <Button variant="neutral" onClick={() => setActiveTab('builder')}>
                   <Plus className="mr-2 h-4 w-4" />
                   {t('template.createFirst')}
                 </Button>
@@ -192,7 +192,7 @@ export default function TicketTemplateManagement() {
                         <div className="flex gap-2">
                           {hasPermission(PERMISSIONS.TICKET_TEMPLATE.DELETE) && (
                             <Button
-                              variant="destructive"
+                              variant="default"
                               onClick={() => handleDeleteClick(template)}
                             >
                             <X className="mr-2 h-4 w-4" />

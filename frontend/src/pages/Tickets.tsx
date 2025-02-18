@@ -137,7 +137,7 @@ export default function TicketsPage() {
           />
           <div className="flex items-center rounded-lg border p-1">
             <Button
-              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              variant={viewMode === 'table' ? 'default' : null}
               size="sm"
               onClick={() => setViewMode('table')}
               className="px-3"
@@ -145,7 +145,7 @@ export default function TicketsPage() {
               {t('navigation.tickets.viewMode.table')}
             </Button>
             <Button
-              variant={viewMode === 'visualization' ? 'default' : 'ghost'}
+              variant={viewMode === 'visualization' ? 'default' : null}
               size="sm"
               onClick={() => setViewMode('visualization')}
               className="px-3"
@@ -260,7 +260,7 @@ export default function TicketsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button variant="outline" onClick={() => setAssignDialogOpen(false)}>
+            <Button variant="neutral" onClick={() => setAssignDialogOpen(false)}>
               {t('common.cancel')}
             </Button>
             <Button
@@ -445,9 +445,9 @@ export default function TicketsPage() {
                             )}
                             <TableCell className='text-center'>
                               <Badge
-                                variant={ticket.priority === 'high' ? 'destructive' :
+                                variant={ticket.priority === 'high' ? 'default' :
                                   ticket.priority === 'medium' ? 'default' :
-                                    'secondary'}
+                                    'neutral'}
                               >
                                 {t(`tickets.priority.${ticket.priority}`)}
                               </Badge>
@@ -479,7 +479,7 @@ export default function TicketsPage() {
                               <div className="flex items-center justify-center gap-2">
                                 {ticket.workflow_data.steps[currentStep.id]?.status === 'completed' ? (
                                   <Button
-                                    variant="ghost"
+                                    variant={null}
                                     className="h-8"
                                     onClick={() => {
                                       setSelectedTicket(ticket);
@@ -492,7 +492,7 @@ export default function TicketsPage() {
                                   </Button>
                                 ) : ticket.workflow_data.steps[currentStep.id]?.assignee_id === user?.id ? (
                                   <Button
-                                    variant="ghost"
+                                    variant={null}
                                     className="h-8"
                                     onClick={() => {
                                       setSelectedTicket(ticket);
@@ -505,7 +505,7 @@ export default function TicketsPage() {
                                   </Button>
                                 ) : (
                                   <Button
-                                    variant="ghost"
+                                    variant={null}
                                     className="h-8"
                                     onClick={() => {
                                       setTicketToAssign({ ticket, stepId: currentStep.id });
@@ -517,7 +517,7 @@ export default function TicketsPage() {
                                   </Button>
                                 )}
                                 <Button
-                                  variant="ghost"
+                                  variant={null}
                                   className="h-8 text-destructive"
                                   onClick={() => {
                                     setTicketToDelete(ticket);
@@ -570,7 +570,7 @@ export default function TicketsPage() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button
-                          variant="outline"
+                          variant="neutral"
                           className="h-8 w-8 p-0"
                           onClick={() => setCurrentPage(1)}
                           disabled={currentPage === 1}
@@ -579,7 +579,7 @@ export default function TicketsPage() {
                           <ChevronsLeft className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="neutral"
                           className="h-8 w-8 p-0"
                           onClick={() => setCurrentPage(currentPage - 1)}
                           disabled={currentPage === 1}
@@ -588,7 +588,7 @@ export default function TicketsPage() {
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="neutral"
                           className="h-8 w-8 p-0"
                           onClick={() => setCurrentPage(currentPage + 1)}
                           disabled={currentPage === totalPages}
@@ -597,7 +597,7 @@ export default function TicketsPage() {
                           <ChevronRight className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="neutral"
                           className="h-8 w-8 p-0"
                           onClick={() => setCurrentPage(totalPages)}
                           disabled={currentPage === totalPages}

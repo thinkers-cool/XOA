@@ -315,13 +315,13 @@ export default function UserProfile() {
                     </div>
                     <div className="flex gap-2">
                         <Button
-                            variant="outline"
+                            variant="neutral"
                             onClick={() => setPasswordDialogOpen(true)}
                             className="hover:bg-muted/50 transition-colors"
                         >
                             {t('profile.password.change')}
                         </Button>
-                        <Button variant="outline" onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive transition-colors">
+                        <Button variant="neutral" onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive transition-colors">
                             {t('profile.actions.logout')}
                         </Button>
                     </div>
@@ -353,7 +353,7 @@ export default function UserProfile() {
                                     <label htmlFor="avatar-upload">
                                         <Button
                                             type="button"
-                                            variant="secondary"
+                                            variant="neutral"
                                             size="icon"
                                             className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                                             asChild
@@ -440,7 +440,7 @@ export default function UserProfile() {
                                                     </span>
                                                     <div className="flex flex-wrap gap-2">
                                                         {role.permissions.map(permission => (
-                                                            <Badge key={permission} variant="outline" className="px-3 py-1 text-xs font-semibold rounded-full bg-muted text-muted-foreground">
+                                                            <Badge key={permission} variant="neutral" className="px-3 py-1 text-xs font-semibold rounded-full bg-muted text-muted-foreground">
                                                                 {t(`role.permission.${permission}`)}
                                                             </Badge>
                                                         ))}
@@ -488,7 +488,7 @@ export default function UserProfile() {
                         )}
                         <div className="flex justify-end gap-3 w-full">
                             <Button
-                                variant="outline"
+                                variant="neutral"
                                 size="sm"
                                 onClick={() => {
                                     setCropDialogOpen(false);
@@ -530,7 +530,7 @@ export default function UserProfile() {
                                 />
                                 <Button
                                     type="button"
-                                    variant="ghost"
+                                    variant={null}
                                     size="icon"
                                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                                     onClick={() => setFormData(prev => ({ ...prev, showCurrentPassword: !prev.showCurrentPassword }))}
@@ -559,7 +559,7 @@ export default function UserProfile() {
                                 />
                                 <Button
                                     type="button"
-                                    variant="ghost"
+                                    variant={null}
                                     size="icon"
                                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                                     onClick={() => setFormData(prev => ({ ...prev, showNewPassword: !prev.showNewPassword }))}
@@ -588,7 +588,7 @@ export default function UserProfile() {
                                 />
                                 <Button
                                     type="button"
-                                    variant="ghost"
+                                    variant={null}
                                     size="icon"
                                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                                     onClick={() => setFormData(prev => ({ ...prev, showConfirmPassword: !prev.showConfirmPassword }))}
@@ -607,7 +607,7 @@ export default function UserProfile() {
                         <div className="flex justify-end gap-3 pt-4">
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant="neutral"
                                 onClick={() => setPasswordDialogOpen(false)}
                                 className="min-w-[100px]"
                             >
