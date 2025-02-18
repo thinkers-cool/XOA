@@ -35,7 +35,10 @@ class Message(BaseModel):
 class TemplateRequest(BaseModel):
     messages: List[Message]
 
-SYSTEM_PROMPT = r"""You are a ticket template design assistant. Help users design workflow templates based on their requirements.
+class ResourceRequest(BaseModel):
+    messages: List[Message]
+
+TEMPLATE_SYSTEM_PROMPT = r"""You are a ticket template design assistant. Help users design workflow templates based on their requirements.
 
 Please respond in this exact format:
 1. First, write "Here's my suggestion for your workflow template:" (required)
@@ -122,6 +125,55 @@ async def stream_chat_response(messages: List[Dict[str, str]]) -> AsyncGenerator
             detail=f"OpenAI API error: {str(e)}"
         )
 
+RESOURCE_SYSTEM_PROMPT = r"""You are a resource type design assistant. Help users design resource types based on their requirements.
+
+Please respond in this exact format:
+1. First, write "Here's my suggestion for your resource type:" (required)
+2. Then, write a brief explanation (required)
+3. Finally, output the complete resource type in this format (required):
+
+<resource>
+{
+    "name": "Resource type name",           // Required
+    "description": "Resource description",   // Required
+    "version": "1.0",                      // Required
+    "fields": [                            // Required, at least one field
+        {
+            "id": "field_1",                // Required, unique
+            "name": "field_name",           // Required
+            "type": "text|textarea|number|select|checkbox_group|radio_group|datetime|file",  // Required
+            "label": "Field Label",         // Required
+            "required": true,               // Required
+            "validation": {                 // Required for text, textarea, number
+                "min_length": 0,
+                "max_length": 100
+            },
+            "width": "full|1/2|1/3",        // Required
+            "help_text": "Helper text",
+            "placeholder": "Placeholder text",
+            "options": ["option1", "option2"]  // Required for select, checkbox_group, radio_group
+        }
+    ],
+    "metainfo": {                          // Required
+        "searchable_fields": ["field1"],   // Required
+        "filterable_fields": ["field1"],   // Required
+        "default_sort_field": "field1",    // Required
+        "tags": ["tag1", "tag2"],          // Required
+        "category": "category_name"         // Required
+    }
+}
+</resource>
+
+Requirements:
+1. Always use <resource> markers instead of ```json
+2. Ensure JSON is properly formatted and valid
+3. Include all required fields
+4. Use correct field types
+5. Make all IDs unique
+6. Ensure searchable and filterable fields reference valid field IDs
+
+Please provide your resource type requirements, and I'll help you design a suitable structure."""
+
 @router.post("/template-suggest")
 async def suggest_template(request: TemplateRequest) -> StreamingResponse:
     """Generate template suggestion using AI"""
@@ -129,7 +181,7 @@ async def suggest_template(request: TemplateRequest) -> StreamingResponse:
         messages = [
             {
                 "role": "system",
-                "content": SYSTEM_PROMPT.strip()
+                "content": TEMPLATE_SYSTEM_PROMPT.strip()
             }
         ]
         messages.extend([
@@ -149,4 +201,33 @@ async def suggest_template(request: TemplateRequest) -> StreamingResponse:
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate template: {str(e)}"
+        )
+
+@router.post("/resource-suggest")
+async def suggest_resource(request: ResourceRequest) -> StreamingResponse:
+    """Generate resource type suggestion using AI"""
+    try:
+        messages = [
+            {
+                "role": "system",
+                "content": RESOURCE_SYSTEM_PROMPT.strip()
+            }
+        ]
+        messages.extend([
+            {
+                "role": msg.role,
+                "content": msg.content.strip()
+            } for msg in request.messages
+        ])
+
+        return StreamingResponse(
+            stream_chat_response(messages),
+            media_type="text/event-stream"
+        )
+
+    except Exception as e:
+        logger.exception("Resource suggestion failed:")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate resource type: {str(e)}"
         )

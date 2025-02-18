@@ -56,7 +56,6 @@ export default function TicketTemplateManagement() {
   };
 
   const handleAISuggest = (suggestedTemplate: any) => {
-    // Initialize with suggested data but without an ID for new template
     setSelectedTemplate({
       name: suggestedTemplate.name,
       description: suggestedTemplate.description,
@@ -70,8 +69,6 @@ export default function TicketTemplateManagement() {
       }
     });
     setIsUpdating(false);
-    
-    // Show the builder and switch to builder tab
     setShowBuilder(true);
     setActiveTab('builder');
   };
@@ -292,7 +289,13 @@ export default function TicketTemplateManagement() {
         </TabsContent>
       </Tabs>
 
-      <AIAssistant onSuggest={handleAISuggest} />
+      <AIAssistant 
+        onSuggest={handleAISuggest}
+        endpoint="/ai/template-suggest"
+        storageKey="ticket-template-ai-chat-storage"
+        sections={['template']}
+        includeHistory={false}
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { ResourceType, ResourceEntry, ResourceTypeCreate } from '@/interface/Res
 import { ResourceTypeForm } from '@/components/resource/ResourceTypeForm';
 import { ResourceEntryForm } from '@/components/resource/ResourceEntryForm';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AIAssistant } from '@/components/ai/AIAssistant';
 
 export default function ResourceManagement() {
   const [activeTab, setActiveTab] = useState('resources');
@@ -19,6 +20,7 @@ export default function ResourceManagement() {
   const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([]);
   const [resourceEntries, setResourceEntries] = useState<ResourceEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createEntryDialogOpen, setCreateEntryDialogOpen] = useState(false);
@@ -33,7 +35,7 @@ export default function ResourceManagement() {
       try {
         const [types, entries] = await Promise.all([
           resourceTypeApi.getAll(),
-          selectedResourceType ? resourceEntryApi.getByTypeId(selectedResourceType.id) : Promise.resolve([])
+          selectedResourceType && selectedResourceType.id ? resourceEntryApi.getByTypeId(selectedResourceType.id) : Promise.resolve([])
         ]);
         setResourceTypes(types);
         setResourceEntries(entries);
@@ -52,6 +54,24 @@ export default function ResourceManagement() {
   const handleViewEntries = (type: ResourceType) => {
     setSelectedResourceType(type);
     setCreateDialogOpen(true);
+  };
+
+  const handleAISuggest = (suggestedResource: any) => {
+    setSelectedResourceType({
+      name: suggestedResource.name,
+      description: suggestedResource.description,
+      version: suggestedResource.version,
+      fields: suggestedResource.fields || [],
+      metainfo: suggestedResource.metainfo || {
+        searchable_fields: [],
+        filterable_fields: [],
+        default_sort_field: '',
+        tags: [],
+        category: ''
+      }
+    });
+    setIsUpdating(false);
+    setActiveTab('builder');
   };
 
   return (
@@ -104,46 +124,49 @@ export default function ResourceManagement() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {resourceTypes.map((type) => (
-                <Card key={type.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">{type.name}</h3>
-                    <p className="text-muted-foreground mb-4">{type.description}</p>
-                    <div className="flex justify-between items-center gap-2">
+                <Card key={type.id} className="hover:shadow-lg transition-shadow h-full flex flex-col">
+                  <CardContent className="p-6 flex flex-col flex-1">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold mb-2">{type.name}</h3>
+                      <p className="text-muted-foreground mb-4">{type.description}</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedResourceType(type);
+                          setIsUpdating(true);
+                          setActiveTab('builder');
+                        }}
+                        className="w-full sm:w-auto p-2"
+                      >
+                        <Edit className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">{t('resources.actions.edit')}</span>
+                      </Button>
+                      <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                              setSelectedResourceType(type);
-                              setActiveTab('builder');
-                          }}
-                          className="sm:w-auto w-10 p-0 sm:p-2"
+                          onClick={() => handleViewEntries(type)}
+                          className="w-full sm:w-auto p-2"
                         >
-                            <Edit className="h-4 w-4 sm:mr-2" />
-                            <span className="hidden sm:inline">{t('resources.actions.edit')}</span>
+                          <Eye className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">{t('resources.actions.viewEntries')}</span>
                         </Button>
-                        <div className="flex justify-end items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewEntries(type)}
-                            className="sm:w-auto w-10 p-0 sm:p-2"
-                          >
-                            <Eye className="h-4 w-4 sm:mr-2" />
-                            <span className="hidden sm:inline">{t('resources.actions.viewEntries')}</span>
-                          </Button>
-                          <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => {
-                                  setSelectedResourceType(type);
-                                  setCreateEntryDialogOpen(true);
-                              }}
-                              className="sm:w-auto w-10 p-0 sm:p-2"
-                          >
-                              <Plus className="h-4 w-4 sm:mr-2" />
-                              <span className="hidden sm:inline">{t('resources.actions.addEntry')}</span>
-                          </Button>
-                        </div>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedResourceType(type);
+                            setCreateEntryDialogOpen(true);
+                          }}
+                          className="w-full sm:w-auto p-2"
+                        >
+                          <Plus className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">{t('resources.actions.addEntry')}</span>
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -155,13 +178,13 @@ export default function ResourceManagement() {
             <DialogContent className="max-w-6xl w-full">
               <DialogHeader>
                 <DialogTitle>
-                  {selectedResourceType ? 
-                    t('resources.viewEntries.title', { name: selectedResourceType.name }) : 
+                  {selectedResourceType ?
+                    t('resources.viewEntries.title', { name: selectedResourceType.name }) :
                     t('resources.createType.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  {selectedResourceType ? 
-                    t('resources.viewEntries.description') : 
+                  {selectedResourceType ?
+                    t('resources.viewEntries.description') :
                     t('resources.createType.description')}
                 </DialogDescription>
               </DialogHeader>
@@ -207,37 +230,37 @@ export default function ResourceManagement() {
                             {filteredEntries
                               .slice((page - 1) * pageSize, page * pageSize)
                               .map((entry) => (
-                              <TableRow key={entry.id}>
-                                {Object.entries(entry.data).map(([key, value]) => (
-                                  <TableCell key={key} className="text-center">
-                                    {(() => {
-                                      if (key === 'coordinates' && typeof value === 'object') {
-                                        const coords = value as { latitude: number; longitude: number };
-                                        return `${coords.latitude.toFixed(4)}°, ${coords.longitude.toFixed(4)}°`;
-                                      }
-                                      if (key === 'features' && Array.isArray(value)) {
-                                        return value.join(', ');
-                                      }
-                                      if (typeof value === 'object') {
-                                        return (
-                                          <Button
-                                            variant="ghost"
-                                            className="h-8"
-                                            onClick={() => {
-                                              console.log('Show detailed view:', value);
-                                            }}
-                                          >
-                                            <Eye className="mr-1 h-4 w-4" />
-                                            {t('common.view')}
-                                          </Button>
-                                        );
-                                      }
-                                      return String(value);
-                                    })()}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
+                                <TableRow key={entry.id}>
+                                  {Object.entries(entry.data).map(([key, value]) => (
+                                    <TableCell key={key} className="text-center">
+                                      {(() => {
+                                        if (key === 'coordinates' && typeof value === 'object') {
+                                          const coords = value as { latitude: number; longitude: number };
+                                          return `${coords.latitude.toFixed(4)}°, ${coords.longitude.toFixed(4)}°`;
+                                        }
+                                        if (key === 'features' && Array.isArray(value)) {
+                                          return value.join(', ');
+                                        }
+                                        if (typeof value === 'object') {
+                                          return (
+                                            <Button
+                                              variant="ghost"
+                                              className="h-8"
+                                              onClick={() => {
+                                                console.log('Show detailed view:', value);
+                                              }}
+                                            >
+                                              <Eye className="mr-1 h-4 w-4" />
+                                              {t('common.view')}
+                                            </Button>
+                                          );
+                                        }
+                                        return String(value);
+                                      })()}
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              ))}
                           </TableBody>
                         </Table>
                       </div>
@@ -347,7 +370,7 @@ export default function ResourceManagement() {
                       });
                       const entries = await resourceEntryApi.getByTypeId(selectedResourceType.id);
                       setResourceEntries(entries);
-        setFilteredEntries(entries);
+                      setFilteredEntries(entries);
                       setCreateEntryDialogOpen(false);
                     } catch (err) {
                       console.error('Error creating resource entry:', err);
@@ -376,34 +399,44 @@ export default function ResourceManagement() {
                 initialResource={selectedResourceType}
                 onSave={async (resource) => {
                   try {
-                      if (selectedResourceType) {
-                        if (selectedResourceType?.id === undefined) {
-                            throw new Error('Resource type ID is required');
-                        }
-                        const updatedType = await resourceTypeApi.update(selectedResourceType.id, resource);
-                        setResourceTypes(resourceTypes.map(type => 
-                            type.id === updatedType.id ? updatedType : type
-                        ));
-                      } else {
-                          const newType = await resourceTypeApi.create(resource);
-                          setResourceTypes([...resourceTypes, newType]);
+                    if (selectedResourceType && isUpdating) {
+                      if (selectedResourceType?.id === undefined) {
+                        throw new Error('Resource type ID is required');
                       }
-                      setSelectedResourceType(null);
-                      setActiveTab('resources');
+                      const updatedType = await resourceTypeApi.update(selectedResourceType.id, resource);
+                      setResourceTypes(resourceTypes.map(type =>
+                        type.id === updatedType.id ? updatedType : type
+                      ));
+                    } else {
+                      const newType = await resourceTypeApi.create(resource);
+                      setResourceTypes([...resourceTypes, newType]);
+                    }
+                    setSelectedResourceType(null);
+                    setIsUpdating(false);
+                    setActiveTab('resources');
                   } catch (err) {
-                      console.error('Error saving resource type:', err);
-                      setError('Failed to save resource type');
+                    console.error('Error saving resource type:', err);
+                    setError('Failed to save resource type');
                   }
-              }}
-              onCancel={() => {
+                }}
+                onCancel={() => {
                   setSelectedResourceType(null);
+                  setIsUpdating(false);
                   setActiveTab('resources');
-              }}
+                }}
               />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AIAssistant
+        onSuggest={handleAISuggest}
+        endpoint="/ai/resource-suggest"
+        storageKey="resource-ai-chat-storage"
+        sections={['resource']}
+        includeHistory={false}
+      />
     </div>
   );
 }

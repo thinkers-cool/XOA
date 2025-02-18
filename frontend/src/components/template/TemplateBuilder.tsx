@@ -34,6 +34,14 @@ export function TemplateBuilder({ initialTemplate, isUpdating, onSave, onCancel 
     const AVAILABLE_ROLES = roles.map(role => role.name);
 
     useEffect(() => {
+        setTemplateName(initialTemplate?.name ?? '');
+        setTemplateDescription(initialTemplate?.description ?? '');
+        setTitleFormat(initialTemplate?.title_format ?? '');
+        setDefaultPriority(initialTemplate?.default_priority ?? 'medium');
+        setWorkflow(initialTemplate?.workflow ?? []);
+    }, [initialTemplate]);
+
+    useEffect(() => {
         const fetchRoles = async () => {
             try {
                 const data = await roleApi.getAll();

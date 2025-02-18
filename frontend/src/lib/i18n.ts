@@ -709,11 +709,14 @@ const resources = {
         },
       },
       ai: {
-        assistant: "AI Assistant",
-        inputPlaceholder: "Describe the ticket template you need...",
-        newChat: "New Chat",
-        send: "Send",
-        error: "Sorry, an error occurred while processing your request. Please try again."
+        assistant: 'AI Assistant',
+        inputPlaceholder: 'Describe your requirement...',
+        newChat: 'New Chat',
+        emptyState: 'You have no ongoing chats. Start a new one by typing your request.',
+        send: 'Send',
+        error: 'Sorry, an error occurred while processing your request. Please try again.',
+        copy: 'Copy',
+        apply: 'Apply',
       }
     },
   },
@@ -1423,11 +1426,14 @@ const resources = {
         },
       },
       ai: {
-        assistant: "AI助手",
-        inputPlaceholder: "描述您需要的工单模板...",
-        newChat: "新对话",
-        send: "发送",
-        error: "抱歉，处理您的请求时出现错误。请重试。"
+        assistant: 'AI助手',
+        inputPlaceholder: '描述您的问题...',
+        newChat: '新对话',
+        emptyState: '开始与AI助手对话',
+        send: '发送',
+        error: '抱歉，处理您的请求时出现错误。请重试。',
+        copy: '复制',
+        apply: '应用',
       }
     },
   },
