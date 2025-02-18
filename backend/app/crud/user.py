@@ -6,7 +6,7 @@ from fastapi import UploadFile
 from ..models.user import User
 from ..schemas.user import UserCreate, UserUpdate
 from ..common.storage import save_avatar, delete_avatar
-from ..routers.auth import get_password_hash
+from ..common.auth import get_password_hash
 
 def get_user(db: Session, user_id: int) -> Optional[User]:
     return db.query(User).filter(User.id == user_id).first()

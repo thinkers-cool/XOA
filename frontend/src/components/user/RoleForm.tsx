@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Role } from '@/interface/Role';
+import { PERMISSIONS } from '@/hooks/usePermissions';
 
 const roleFormSchema = z.object({
   name: z.string().min(1, 'Role name is required'),
@@ -21,29 +22,6 @@ interface RoleFormProps {
   onSubmit: (data: RoleFormValues) => void;
   onCancel: () => void;
 }
-
-const AVAILABLE_PERMISSIONS = [
-  'user.view',
-  'user.create',
-  'user.edit',
-  'user.delete',
-  'role.view',
-  'role.create',
-  'role.edit',
-  'role.delete',
-  'ticket.view',
-  'ticket.create',
-  'ticket.edit',
-  'ticket.delete',
-  'template.view',
-  'template.create',
-  'template.edit',
-  'template.delete',
-  'workflow.view',
-  'workflow.create',
-  'workflow.edit',
-  'workflow.delete'
-];
 
 export function RoleForm({ role, onSubmit, onCancel }: RoleFormProps) {
   const { t } = useTranslation();
@@ -97,32 +75,39 @@ export function RoleForm({ role, onSubmit, onCancel }: RoleFormProps) {
         <div className="space-y-2">
           <FormLabel>{t('role.form.permissions')}</FormLabel>
           <div className="grid grid-cols-2 gap-4">
-            {AVAILABLE_PERMISSIONS.map((permission) => (
-              <FormField
-                key={permission}
-                control={form.control}
-                name="permissions"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value?.includes(permission)}
-                        onCheckedChange={(checked) => {
-                          const updatedPermissions = checked
-                            ? [...field.value, permission]
-                            : field.value?.filter((p) => p !== permission);
-                          field.onChange(updatedPermissions);
-                        }}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        {t(`role.permission.${permission}`)}
-                      </FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
+            {Object.entries(PERMISSIONS).map(([category, operations]) => (
+              <div key={category} className="space-y-2">
+                <div className="font-medium">{t(`role.permission.category.${category}`)}</div>
+                <div className="flex flex-wrap gap-4">
+                  {Object.entries(operations).map(([operation, permission]) => (
+                    <FormField
+                      key={permission}
+                      control={form.control}
+                      name="permissions"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(permission)}
+                              onCheckedChange={(checked) => {
+                                const updatedPermissions = checked
+                                  ? [...field.value, permission]
+                                  : field.value?.filter((p) => p !== permission);
+                                field.onChange(updatedPermissions);
+                              }}
+                            />
+                          </FormControl>
+                          <div className="leading-none">
+                            <FormLabel className="cursor-pointer">
+                              {t(`role.permission.operation.${operation}`)}
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>

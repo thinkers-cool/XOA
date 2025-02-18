@@ -35,3 +35,6 @@ ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://loc
 # AI API settings
 AI_API_BASE_URL = os.getenv("AI_API_BASE_URL")
 AI_API_KEY = os.getenv("AI_API_KEY")
+
+# Registration settings
+ALLOW_REGISTRATION = os.getenv("ALLOW_REGISTRATION", "True").lower() == "true"

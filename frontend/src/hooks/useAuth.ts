@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
 import { User } from '@/interface/User';
 import { useTranslation } from 'react-i18next';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface AuthState {
   user: User | null;
@@ -40,7 +41,7 @@ export const useAuth = create<AuthState>()(
           const params = new URLSearchParams();
           params.append('username', username);
           params.append('password', password);
-          const response = await api.post('/auth/login', params, {
+          const response = await api.post('/users/login', params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
           });
           set({
@@ -87,12 +88,14 @@ export const useAuth = create<AuthState>()(
           refreshToken: null,
           authError: null
         });
+        usePermissions.getState().clearPermissions();
       },
       fetchCurrentUser: async (t: (key: string) => string) => {
         try {
           set({ userLoading: true, authError: null });
           const response = await api.get('/users/me');
           set({ user: response.data });
+          await usePermissions.getState().fetchUserPermissions();
         } catch (err: unknown) {
           const errorMessage = err && typeof err === 'object' && 'response' in err
             ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || t('auth.errors.fetchUserFailed')
@@ -110,7 +113,7 @@ export const useAuth = create<AuthState>()(
             throw new Error('No refresh token available');
           }
 
-          const response = await api.post('/auth/refresh', null, {
+          const response = await api.post('/users/refresh', null, {
             headers: { Authorization: `Bearer ${currentRefreshToken}` }
           });
 

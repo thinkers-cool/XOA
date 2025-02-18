@@ -12,9 +12,11 @@ import { Role } from '@/interface/Role';
 import { UserForm } from '@/components/user/UserForm';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { usePermissions, PERMISSIONS } from '@/hooks/usePermissions';
 
 export function UserList() {
     const { t } = useTranslation();
+    const { hasPermission, fetchUserPermissions } = usePermissions();
     const [users, setUsers] = useState<User[]>([]);
     const [userRoles, setUserRoles] = useState<Record<number, UserRole[]>>({});
     const [roles, setRoles] = useState<Role[]>([]);
@@ -25,6 +27,7 @@ export function UserList() {
 
     useEffect(() => {
         const fetchUsers = async () => {
+            await fetchUserPermissions();
             try {
                 const data = await userApi.getAll();
                 setUsers(data);
@@ -78,6 +81,7 @@ export function UserList() {
     }
 
     const handleDelete = async (userId: number) => {
+        if (!hasPermission(PERMISSIONS.USER.DELETE)) return;
         try {
             await userApi.delete(userId);
             setUsers(users.filter(user => user.id !== userId));
@@ -87,6 +91,7 @@ export function UserList() {
     };
 
     const handleCreateUser = async (data: any) => {
+        if (!hasPermission(PERMISSIONS.USER.CREATE)) return;
         try {
             const newUser = await userApi.create(data);
             if (data.role) {
@@ -104,6 +109,7 @@ export function UserList() {
     };
 
     const handleUpdateUser = async (data: any) => {
+        if (!hasPermission(PERMISSIONS.USER.UPDATE)) return;
         try {
             if (!selectedUser?.id) return;
             const updatedUser = await userApi.update(selectedUser.id, data);
@@ -126,12 +132,14 @@ export function UserList() {
         <div className="space-y-4">
             <div className="flex justify-end mb-4">
                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                    <DialogTrigger asChild>
-                        <Button onClick={() => setSelectedUser(undefined)}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            {t('user.create.title')}
-                        </Button>
-                    </DialogTrigger>
+                    {hasPermission(PERMISSIONS.USER.CREATE) && (
+                        <DialogTrigger asChild>
+                            <Button onClick={() => setSelectedUser(undefined)}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                {t('user.create.title')}
+                            </Button>
+                        </DialogTrigger>
+                    )}
                     <DialogContent className="max-w-3xl">
                         <DialogHeader>
                             <DialogTitle>{selectedUser ? t('user.edit.title') : t('user.create.title')}</DialogTitle>
@@ -166,10 +174,10 @@ export function UserList() {
                                 <TableCell className="py-3 font-medium text-center">
                                     <div className="flex items-center justify-center gap-2">
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage 
-                                                src={user.avatar_url ? `${API_BASE_URL}${user.avatar_url}` : undefined} 
+                                            <AvatarImage
+                                                src={user.avatar_url ? `${API_BASE_URL}${user.avatar_url}` : undefined}
                                                 alt={user.full_name}
-                                                className="h-full w-full object-cover" 
+                                                className="h-full w-full object-cover"
                                             />
                                             <AvatarFallback>{user.full_name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                                         </Avatar>
@@ -219,45 +227,49 @@ export function UserList() {
                                 </TableCell>
                                 <TableCell className="py-3 text-center">
                                     <div className="flex justify-end gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8"
-                                            onClick={() => {
-                                                setSelectedUser(user);
-                                                setIsFormOpen(true);
-                                            }}
-                                        >
-                                            <UserRoundCog className="h-4 w-4" />
-                                        </Button>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>{t('user.delete.title')}</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        {t('user.delete.description', { name: user.full_name })}
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                                                    <AlertDialogAction
-                                                        onClick={() => handleDelete(user.id!)}
-                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        {hasPermission(PERMISSIONS.USER.UPDATE) &&
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8"
+                                                onClick={() => {
+                                                    setSelectedUser(user);
+                                                    setIsFormOpen(true);
+                                                }}
+                                            >
+                                                <UserRoundCog className="h-4 w-4" />
+                                            </Button>
+                                        }
+                                        {hasPermission(PERMISSIONS.USER.DELETE) &&
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                                                     >
-                                                        {t('common.delete')}
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>{t('user.delete.title')}</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            {t('user.delete.description', { name: user.full_name })}
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={() => handleDelete(user.id!)}
+                                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                        >
+                                                            {t('common.delete')}
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        }
                                     </div>
                                 </TableCell>
                             </TableRow>

@@ -19,11 +19,13 @@ import { ticketApi, templateApi, API_BASE_URL } from '@/lib/api';
 import { Ticket } from '@/interface/Ticket';
 import { TicketTemplate } from '@/interface/TicketTemplate';
 import { TicketVisualization } from '@/components/ticket/TicketVisualization';
+import { PERMISSIONS, usePermissions } from '@/hooks/usePermissions';
 
 export default function TicketsPage() {
   const location = useLocation();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { hasPermission, fetchUserPermissions } = usePermissions();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [templates, setTemplates] = useState<TicketTemplate[]>([]);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -41,7 +43,7 @@ export default function TicketsPage() {
   const [itemsPerPage] = useState(10);
 
   const filteredTickets = useMemo(() => {
-    return tickets.filter(ticket => 
+    return tickets.filter(ticket =>
       ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticket.priority.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -58,6 +60,7 @@ export default function TicketsPage() {
 
   useEffect(() => {
     const fetchUsers = async () => {
+      await fetchUserPermissions();
       try {
         const usersData = await userApi.getAll();
         const usersMap = usersData.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
@@ -150,10 +153,12 @@ export default function TicketsPage() {
               {t('navigation.tickets.viewMode.workflow')}
             </Button>
           </div>
-          <Button onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="mr-1 h-4 w-4" />
-            {t('navigation.tickets.newTicket')}
-          </Button>
+          {hasPermission(PERMISSIONS.TICKET.CREATE) && (
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" />
+              {t('navigation.tickets.newTicket')}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -226,7 +231,7 @@ export default function TicketsPage() {
               // Check if all steps are completed
               const allStepsCompleted = templates
                 .find(t => t.id === selectedTicket.template_id)!
-                .workflow.every(step => 
+                .workflow.every(step =>
                   updatedSteps[step.id]?.status === 'completed'
                 );
 
@@ -387,10 +392,10 @@ export default function TicketsPage() {
                                         <div className="flex items-center justify-center gap-2 mb-1 last:mb-0">
                                           <div className="flex items-center gap-2">
                                             <Avatar className="h-8 w-8">
-                                              <AvatarImage 
-                                                  src={assignee?.avatar_url ? `${API_BASE_URL}${assignee.avatar_url}` : undefined} 
-                                                  alt={assignee.full_name}
-                                                  className="h-full w-full object-cover" 
+                                              <AvatarImage
+                                                src={assignee?.avatar_url ? `${API_BASE_URL}${assignee.avatar_url}` : undefined}
+                                                alt={assignee.full_name}
+                                                className="h-full w-full object-cover"
                                               />
                                               <AvatarFallback>{assignee?.full_name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                                             </Avatar>
@@ -407,7 +412,7 @@ export default function TicketsPage() {
                                 <TableCell className="text-center">
                                   {(() => {
                                     const totalSteps = template.workflow.length;
-                                    const completedSteps = template.workflow.filter(step => 
+                                    const completedSteps = template.workflow.filter(step =>
                                       ticket.workflow_data.steps[step.id]?.status === 'completed'
                                     ).length;
                                     const completionRate = Math.round((completedSteps / totalSteps) * 100);
@@ -423,10 +428,10 @@ export default function TicketsPage() {
                                       return (
                                         <div className="flex items-center justify-center gap-2">
                                           <Avatar className="h-8 w-8">
-                                            <AvatarImage 
-                                                src={finalAssignee?.avatar_url ? `${API_BASE_URL}${finalAssignee.avatar_url}` : undefined} 
-                                                alt={finalAssignee.full_name}
-                                                className="h-full w-full object-cover" 
+                                            <AvatarImage
+                                              src={finalAssignee?.avatar_url ? `${API_BASE_URL}${finalAssignee.avatar_url}` : undefined}
+                                              alt={finalAssignee.full_name}
+                                              className="h-full w-full object-cover"
                                             />
                                             <AvatarFallback>{finalAssignee?.full_name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                                           </Avatar>

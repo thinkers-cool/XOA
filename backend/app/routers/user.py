@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List
 import os
@@ -9,14 +11,35 @@ from ..crud import user as crud_user
 from ..crud import role as crud_role
 from ..schemas.user import User, UserCreate, UserUpdate
 from ..schemas.role import RoleCreate, UserRoleCreate
+from ..models.user import User as UserModel
 from ..database import get_db
-from .auth import get_current_user, verify_password
-from ..settings import AVATAR_UPLOAD_DIR
+from ..settings import AVATAR_UPLOAD_DIR, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..common.permissions import has_permissions, PERMISSIONS
+from ..common.auth import (
+    verify_password, get_password_hash, create_access_token, create_refresh_token,
+    get_current_user, Token, UserLogin, oauth2_scheme
+)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("/", response_model=User)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+async def create_user(user: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Check if this is the first user registration
+    existing_users = crud_user.get_users(db, skip=0, limit=1)
+    is_first_user = len(existing_users) == 0
+
+    # If not first user, check permissions
+    if not is_first_user:
+        # Wrap the function with permission check
+        @has_permissions([PERMISSIONS['USER_CREATE']])
+        async def create_user_with_permission(user: UserCreate, db: Session, current_user: User):
+            return await create_user_internal(user, db)
+        return await create_user_with_permission(user, db, current_user)
+    
+    # For first user, proceed without permission check
+    return await create_user_internal(user, db)
+
+async def create_user_internal(user: UserCreate, db: Session):
     db_user = crud_user.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -56,36 +79,115 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 @router.get("/", response_model=List[User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@has_permissions([PERMISSIONS['USER_READ']])
+async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     users = crud_user.get_users(db, skip=skip, limit=limit)
     return users
 
 @router.get("/me", response_model=User)
-def read_current_user(current_user: User = Depends(get_current_user)):
+@has_permissions([PERMISSIONS['USER_READ']])
+async def read_current_user(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return current_user
 
 @router.get("/{user_id}", response_model=User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
+@has_permissions([PERMISSIONS['USER_READ']])
+async def read_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_user = crud_user.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
 @router.put("/{user_id}", response_model=User)
-def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+@has_permissions([PERMISSIONS['USER_UPDATE']])
+async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_user = crud_user.update_user(db, user_id=user_id, user=user)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
 @router.delete("/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+@has_permissions([PERMISSIONS['USER_DELETE']])
+async def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     success = crud_user.delete_user(db, user_id=user_id)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
     return {"ok": True}
 
+@router.post("/register", response_model=Token)
+async def register(user: UserCreate, db: Session = Depends(get_db)):
+    # Create user using the create_user endpoint logic
+    try:
+        db_user = await create_user_internal(user, db)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+    # Create tokens
+    access_token = create_access_token(
+        data={"sub": db_user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    refresh_token = create_refresh_token(data={"sub": db_user.username})
+
+    return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
+
+@router.post("/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(UserModel).filter(UserModel.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    refresh_token = create_refresh_token(data={"sub": user.username})
+
+    return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        is_refresh = payload.get("refresh")
+        if not username or not is_refresh:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token"
+            )
+        
+        user = db.query(UserModel).filter(UserModel.username == username).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found"
+            )
+
+        access_token = create_access_token(
+            data={"sub": username},
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        )
+        new_refresh_token = create_refresh_token(data={"sub": username})
+
+        return {"access_token": access_token, "token_type": "bearer", "refresh_token": new_refresh_token}
+
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token"
+        )
+
 @router.put("/{user_id}/avatar", response_model=User)
+@has_permissions([PERMISSIONS['USER_UPDATE']])
 async def update_user_avatar(
     user_id: int,
     file: UploadFile = File(...),
@@ -129,6 +231,7 @@ class PasswordUpdate(BaseModel):
     new_password: str
 
 @router.put("/{user_id}/password")
+@has_permissions([PERMISSIONS['USER_UPDATE']])
 def update_password(
     user_id: int,
     password_update: PasswordUpdate,

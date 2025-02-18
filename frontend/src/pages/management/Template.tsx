@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Type, Plus, Clock, Edit, X, Workflow, PlusCircle } from 'lucide-react';
+import { Type, Plus, Clock, Edit, X, Workflow } from 'lucide-react';
 import { TemplateBuilder } from '@/components/template/TemplateBuilder';
 import { templateApi } from '@/lib/api';
 import { TicketTemplate } from '@/interface/TicketTemplate';
@@ -11,6 +11,7 @@ import { WorkflowGraph } from '@/components/template/WorkflowGraph';
 import { WorkflowStepItem } from '@/components/template/WorkflowStepItem';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AIAssistant } from '@/components/ai/AIAssistant';
+import { usePermissions, PERMISSIONS } from '@/hooks/usePermissions';
 
 export default function TicketTemplateManagement() {
   const [templates, setTemplates] = useState<TicketTemplate[]>([]);
@@ -20,10 +21,12 @@ export default function TicketTemplateManagement() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<TicketTemplate | null>(null);
   const { t } = useTranslation();
+  const { hasPermission, fetchUserPermissions } = usePermissions();
   const [showBuilder, setShowBuilder] = useState(false);
 
   useEffect(() => {
     const fetchTemplates = async () => {
+      await fetchUserPermissions();
       try {
         const data = await templateApi.getAll();
         setTemplates(data.map(template => ({ ...template, workflow: template.workflow || [] })));
@@ -80,9 +83,9 @@ export default function TicketTemplateManagement() {
           <h1 className="text-3xl font-bold">{t('template.title')}</h1>
           <p className="">{t('template.subtitle')}</p>
         </div>
-        {!showBuilder && (
+        {!showBuilder && hasPermission(PERMISSIONS.TICKET_TEMPLATE.CREATE) && (
           <Button onClick={() => setShowBuilder(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 h-4 w-4" />
             {t('template.create')}
           </Button>
         )}
@@ -111,7 +114,9 @@ export default function TicketTemplateManagement() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="templates">{t('template.tabs.list')}</TabsTrigger>
+          { hasPermission(PERMISSIONS.TICKET_TEMPLATE.CREATE) && 
           <TabsTrigger value="builder">{t('template.tabs.builder')}</TabsTrigger>
+          }
         </TabsList>
 
         <TabsContent value="templates" className="space-y-4">
@@ -124,10 +129,12 @@ export default function TicketTemplateManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {hasPermission(PERMISSIONS.TICKET_TEMPLATE.CREATE) && 
                 <Button variant="outline" onClick={() => setActiveTab('builder')}>
                   <Plus className="mr-2 h-4 w-4" />
                   {t('template.createFirst')}
                 </Button>
+                }
               </CardContent>
             </Card>
           ) : (
@@ -183,16 +190,19 @@ export default function TicketTemplateManagement() {
                       </div>
                       <div className="flex justify-end gap-2">
                         <div className="flex gap-2">
-                          <Button
-                            variant="destructive"
-                            onClick={() => handleDeleteClick(template)}
-                          >
+                          {hasPermission(PERMISSIONS.TICKET_TEMPLATE.DELETE) && (
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDeleteClick(template)}
+                            >
                             <X className="mr-2 h-4 w-4" />
                             {t('common.delete')}
                           </Button>
-                          <Button
-                            variant="default"
-                            onClick={() => {
+                          )}
+                          {hasPermission(PERMISSIONS.TICKET_TEMPLATE.UPDATE) && (
+                            <Button
+                              variant="default"
+                              onClick={() => {
                               setSelectedTemplate(template);
                               setIsUpdating(true);
                               setActiveTab('builder');
@@ -201,6 +211,7 @@ export default function TicketTemplateManagement() {
                             <Edit className="mr-2 h-4 w-4" />
                             {t('template.editTemplate')}
                           </Button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -272,7 +283,7 @@ export default function TicketTemplateManagement() {
               </CardHeader>
               <CardContent>
                 <Button onClick={() => setShowBuilder(true)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <Plus className="mr-2 h-4 w-4" />
                   {t('template.create')}
                 </Button>
               </CardContent>

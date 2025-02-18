@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
-import { userApi } from '@/lib/api';
+import { api } from '@/lib/api';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -39,7 +39,7 @@ export default function Register() {
 
         try {
             setLoading(true);
-            await userApi.create({
+            await api.post('/users/register', {
                 email: formData.email,
                 username: formData.username,
                 full_name: formData.full_name,

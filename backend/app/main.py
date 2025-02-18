@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from .routers import ticket, ticket_template, user, role, file, auth, preferences, resource, ai
+from .routers import ticket, ticket_template, user, role, file, preferences, resource, ai
 from .settings import STORAGE_DIR
 
 app = FastAPI(
@@ -15,7 +15,6 @@ app.include_router(ticket_template.router)
 app.include_router(user.router)
 app.include_router(role.router)
 app.include_router(file.router)
-app.include_router(auth.router)
 app.include_router(preferences.router)
 app.include_router(resource.router)
 app.include_router(ai.router)

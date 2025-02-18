@@ -3,16 +3,18 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from ..database import get_db
-from .auth import get_current_user
+from ..common.auth import get_current_user
 from ..crud import preferences as preferences_crud
 from ..schemas.preferences import PreferencesCreate, PreferencesUpdate, Preferences
 from ..models.user import User
+from ..common.permissions import has_permissions, PERMISSIONS
 
 router = APIRouter(
     tags=["Preferences"],
 )
 
 @router.post("/preferences", response_model=Preferences)
+@has_permissions([PERMISSIONS['USER_CREATE']])
 def create_preferences(preferences: PreferencesCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     existing_preferences = preferences_crud.get_user_preferences(db, current_user.id)
     if existing_preferences:
@@ -22,6 +24,7 @@ def create_preferences(preferences: PreferencesCreate, current_user: User = Depe
     return user_preferences
 
 @router.get("/preferences", response_model=Preferences)
+@has_permissions([PERMISSIONS['USER_READ']])
 def get_preferences(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     user_preferences = preferences_crud.get_user_preferences(db, current_user.id)
     if not user_preferences:
@@ -43,6 +46,7 @@ def get_preferences(current_user: User = Depends(get_current_user), db: Session 
     return user_preferences
 
 @router.put("/preferences", response_model=Preferences)
+@has_permissions([PERMISSIONS['USER_UPDATE']])
 def update_preferences(preferences: PreferencesUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     updated_preferences = preferences_crud.update_user_preferences(db, current_user.id, preferences)
     if not updated_preferences:

@@ -37,15 +37,15 @@ export function ResourceBuilder({ initialResource, onSave, onCancel }: ResourceB
     const newErrors: typeof errors = {};
 
     if (!resourceName.trim()) {
-      newErrors.resourceName = t('resource.builder.errors.nameRequired');
+      newErrors.resourceName = t('resources.builder.errors.nameRequired');
     }
 
     if (formFields.length === 0) {
-      newErrors.fields = t('resource.builder.errors.fieldsRequired');
+      newErrors.fields = t('resources.builder.errors.fieldsRequired');
     }
 
     if (!version.trim()) {
-      newErrors.version = t('resource.builder.errors.versionRequired');
+      newErrors.version = t('resources.builder.errors.versionRequired');
     }
 
     setErrors(newErrors);
@@ -152,7 +152,7 @@ export function ResourceBuilder({ initialResource, onSave, onCancel }: ResourceB
         )}
         <Button onClick={handleSave}>
           {initialResource ? <Save className="mr-2 h-4 w-4" /> : <Check className="mr-2 h-4 w-4" />}
-          {initialResource ? t('resource.builder.buttons.update') : t('resource.builder.buttons.save')}
+          {initialResource ? t('resources.builder.buttons.update') : t('resources.builder.buttons.save')}
         </Button>
       </div>
     </div>
